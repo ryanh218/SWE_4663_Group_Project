@@ -402,79 +402,42 @@ gimp_filter_tool_initialize (GimpTool     *tool,
       gtk_box_pack_end (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
       gtk_widget_show (hbox);
 
-      toggle = gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                           "preview", NULL);
+      /* Modified Section - Begin */
 
-      /* Only show merge filter option if we're not editing an NDE filter or
-       * applying to a layer group or layer mask */
-      if (((GIMP_IS_LAYER (drawable) || GIMP_IS_CHANNEL (drawable)) &&
-          ! GIMP_IS_GROUP_LAYER (drawable)                          &&
-          ! GIMP_IS_LAYER_MASK (drawable))                          &&
-          ! filter_tool->existing_filter)
-        {
-          gchar *operation_name = NULL;
+      /*  Left side: Preview  */
+      GtkWidget *left_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+      gtk_box_pack_start (GTK_BOX (hbox), left_box, TRUE, TRUE, 0);
 
-          gegl_node_get (filter_tool->operation,
-                         "operation", &operation_name,
-                         NULL);
+      /*  Right side: Split View and Merge Filter  */
+      GtkWidget *right_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+      gtk_box_pack_end (GTK_BOX (hbox), right_box, FALSE, FALSE, 0);
 
-          gtk_box_pack_start (GTK_BOX (hbox), toggle, FALSE, FALSE, 0);
+      /*  Add Preview toggle to left_box  */
+      GtkWidget *preview_toggle =
+          gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
+                                      "preview", NULL);
+      gtk_box_pack_start (GTK_BOX (left_box), preview_toggle, FALSE, FALSE, 0);
 
-          /* TODO: Once we can serialize GimpDrawable, remove so that filters with
-           * aux nodes can be non-destructive */
-          if (gegl_node_has_pad (filter_tool->operation, "aux") ||
-              (g_strcmp0 (operation_name, "gegl:gegl") == 0 &&
-               g_getenv ("GIMP_ALLOW_GEGL_GRAPH_LAYER_EFFECT") == NULL))
-            {
-              GParamSpec  *param_spec;
-              GObject     *obj = G_OBJECT (tool_info->tool_options);
-              gchar       *tooltip;
-              const gchar *disabled_reason;
+      /*  Add Split View toggle to right_box  */
+      GtkWidget *split_toggle =
+          gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
+                                      "preview-split", NULL);
+      gtk_box_pack_start (GTK_BOX (right_box), split_toggle, FALSE, FALSE, 0);
 
-              param_spec = g_object_class_find_property (G_OBJECT_GET_CLASS (obj),
-                                                         "merge-filter");
+      /*  Add Merge Filter toggle below Split View in right_box  */
+      GtkWidget *merge_toggle = gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
+                                                            "merge-filter", NULL);
+      gtk_box_pack_start (GTK_BOX (right_box), merge_toggle, FALSE, FALSE, 0);
 
-              toggle =
-                gtk_check_button_new_with_mnemonic (g_param_spec_get_nick (param_spec));
-
-              gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (toggle), TRUE);
-              gtk_widget_set_sensitive (toggle, FALSE);
-
-              if (gegl_node_has_pad (filter_tool->operation, "aux"))
-                disabled_reason = _("Disabled because this filter depends on another image.");
-              else
-                /* TODO: localize when string freeze is over. */
-                disabled_reason = "Disabled because GEGL Graph is unsafe.\nFor development purpose, "
-                                  "set environment variable GIMP_ALLOW_GEGL_GRAPH_LAYER_EFFECT.";
-
-              tooltip = g_strdup_printf ("%s\n<i>%s</i>", g_param_spec_get_blurb (param_spec), disabled_reason);
-              gimp_help_set_help_data_with_markup (toggle, tooltip, NULL);
-              g_free (tooltip);
-
-              gtk_widget_set_visible (toggle, TRUE);
-            }
-          else
-            {
-              toggle = gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                                   "merge-filter", NULL);
-            }
-
-          gtk_box_pack_start (GTK_BOX (hbox), toggle, TRUE, TRUE, 0);
-
-          g_free (operation_name);
-        }
-      else
-        {
-          gtk_box_pack_start (GTK_BOX (hbox), toggle, TRUE, TRUE, 0);
-        }
-
-      toggle = gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                           "preview-split", NULL);
-      gtk_box_pack_start (GTK_BOX (hbox), toggle, FALSE, FALSE, 0);
-
+      /*  Bind Split View sensitivity to Preview toggle  */
       g_object_bind_property (G_OBJECT (tool_info->tool_options), "preview",
-                              toggle,                             "sensitive",
+                              split_toggle, "sensitive",
                               G_BINDING_SYNC_CREATE);
+
+      /*  Show all widgets */
+      gtk_widget_show_all (hbox);
+
+      /* Modified Section - End */
 
       /*  The show-controller toggle  */
       filter_tool->controller_toggle =
