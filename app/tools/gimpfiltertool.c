@@ -404,41 +404,41 @@ gimp_filter_tool_initialize (GimpTool     *tool,
 
       /* Modified Section - Begin */
 
-      /*  Left side: Preview and Split View (stacked vertically)  */
-      GtkWidget *left_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-      gtk_box_pack_start (GTK_BOX (hbox), left_box, TRUE, TRUE, 0);
+            /*  Left side: Preview  */
+            GtkWidget *left_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+            gtk_box_pack_start(GTK_BOX(hbox), left_box, TRUE, TRUE, 0);
 
-      /*  Right side: Merge Filter  */
-      GtkWidget *right_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-      gtk_box_pack_end (GTK_BOX (hbox), right_box, FALSE, FALSE, 0);
+            /*  Right side: Split View and Merge Filter  */
+            GtkWidget *right_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+            gtk_box_pack_end(GTK_BOX(hbox), right_box, FALSE, FALSE, 0);
 
-      /*  Add Preview toggle to left_box  */
-      GtkWidget *preview_toggle =
-          gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                      "preview", NULL);
-      gtk_box_pack_start (GTK_BOX (left_box), preview_toggle, FALSE, FALSE, 0);
+            /*  Add Preview toggle to left_box  */
+            GtkWidget *preview_toggle =
+                gimp_prop_check_button_new(G_OBJECT(tool_info->tool_options),
+                                           "preview", NULL);
+            gtk_box_pack_start(GTK_BOX(left_box), preview_toggle, FALSE, FALSE, 0);
 
-      /*  Add Split View toggle below Preview in left_box  */
-      GtkWidget *split_toggle =
-          gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                      "preview-split", NULL);
-      gtk_box_pack_start (GTK_BOX (left_box), split_toggle, FALSE, FALSE, 0);
+            /*  Add Split View toggle to right_box  */
+            GtkWidget *split_toggle =
+                gimp_prop_check_button_new(G_OBJECT(tool_info->tool_options),
+                                           "preview-split", NULL);
+            gtk_box_pack_start(GTK_BOX(right_box), split_toggle, FALSE, FALSE, 0);
 
-      /*  Add Merge Filter toggle to right_box  */
-      GtkWidget *merge_toggle =
-          gimp_prop_check_button_new (G_OBJECT (tool_info->tool_options),
-                                      "merge-filter", NULL);
-      gtk_box_pack_start (GTK_BOX (right_box), merge_toggle, FALSE, FALSE, 0);
+            /*  Add Merge Filter toggle below Split View in right_box  */
+            GtkWidget *merge_toggle =
+                gimp_prop_check_button_new(G_OBJECT(tool_info->tool_options),
+                                           "merge-filter", NULL);
+            gtk_box_pack_start(GTK_BOX(right_box), merge_toggle, FALSE, FALSE, 0);
 
-      /*  Bind Split View sensitivity to Preview toggle  */
-      g_object_bind_property (G_OBJECT (tool_info->tool_options), "preview",
-                              split_toggle, "sensitive",
-                              G_BINDING_SYNC_CREATE);
+            /*  Bind Split View sensitivity to Preview toggle */
+            g_object_bind_property(G_OBJECT(tool_info->tool_options), "preview",
+                                   split_toggle, "sensitive",
+                                   G_BINDING_SYNC_CREATE);
 
-      /*  Show all widgets */
-      gtk_widget_show_all (hbox);
+            /*  Show all widgets */
+            gtk_widget_show_all (hbox);
 
-      /* Modified Section - End */
+            /* Modified Section - End */
 
       /*  The show-controller toggle  */
       filter_tool->controller_toggle =
