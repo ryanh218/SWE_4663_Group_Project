@@ -104,6 +104,10 @@ gimp_gegl_tool_class_init (GimpGeglToolClass *klass)
 static void
 gimp_gegl_tool_init (GimpGeglTool *tool)
 {
+  GimpTool *tool2 = GIMP_TOOL (tool);
+
+  gimp_tool_control_set_tool_cursor (tool2->control,
+                                     GIMP_TOOL_CURSOR_MOVE);
 }
 
 static void
